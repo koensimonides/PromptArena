@@ -65,6 +65,10 @@ class PromptArena(object):
             
         parents = self._select_parents(parent_population, original)
 
+        if len(parents) != self.prompt_constructor.parent_count:
+            self.logevent(f"Failed to find parents for original {original.id}")
+            return None
+
         prompt_text = self.prompt_constructor([parent.copy() for parent in parents], parent_population)
 
         session_messages = [
@@ -115,7 +119,9 @@ class PromptArena(object):
             original = np.random.choice(experiment.generation_map[child_generation])
 
             # Run match
-            result: MatchResult = self.run_match(experiment.name, parent_population, original)
+            result: MatchResult | None = self.run_match(experiment.name, parent_population, original)
+            if result == None: # TODO, should in theory never happen
+                continue
 
             # Log results
             if self.log:

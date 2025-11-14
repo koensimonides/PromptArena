@@ -15,7 +15,7 @@ from promptarena.experiment_data import ExperimentDataSet
 expriment_name = "MA_BBOB_same"
 logfiles = [f"data/run-LLaMEA-1-MA_BBOB-{i}/log.jsonl" for i in range(10)]
 mutation_prompt = "Refine the strategy of the selected algorithm to improve it."
-budget = 500
+budget = 10
 api_key = os.getenv("GOOGLE_API_KEY")
 llm_model = "gemini-2.0-flash"
 problem = MA_BBOB_Problem(dims=[5])
@@ -28,6 +28,9 @@ arena = PromptArena(problem, constructor, llm, data, budget=budget, experiment_n
 arena.run()
 print(f"Done")
 
-deltas = [res.fitness_delta for res in arena.results]
-deltas_avg = sum(deltas) / len(deltas)
-print(f"Average fitness delta: {deltas_avg}")
+fitness_deltas = [res.fitness_delta for res in arena.results]
+fitness_deltas_avg = sum(fitness_deltas) / len(fitness_deltas)
+success_deltas = [((1 if res.fitness_delta > 0 else -1) if res.fitness_delta != 0 else 0) for res in arena.results]
+success_deltas_avg = sum(success_deltas) / len(success_deltas)
+print(f"Average fitness delta: {fitness_deltas_avg}")
+print(f"Average success delta: {success_deltas_avg}")

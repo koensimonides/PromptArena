@@ -1,0 +1,15 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+
+# VSCode
+.vscode/
+
+# Data and experiments
+/data
+/exp-*/

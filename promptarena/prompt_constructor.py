@@ -5,16 +5,16 @@ from llamea import Solution
 
 class PromptConstructor(ABC):
 
-    def __init__(self, subject_count: int):
-        self.subject_count = subject_count
+    def __init__(self, parent_count: int):
+        self.parent_count = parent_count
 
-    def __call__(self, subjects: list[Solution], population: list[Solution]) -> str:
-        if (len(subjects) != self.subject_count):
-            raise ValueError(f"Invalid subject count, expected {self.subject_count} but recieved {len(subjects)}")
+    def __call__(self, parents: list[Solution], population: list[Solution]) -> str:
+        if (len(parents) != self.parent_count):
+            raise ValueError(f"Invalid parent count, expected {self.parent_count} but recieved {len(parents)}")
         
-        prompt = self.make_prompt(subjects, population)
+        prompt = self.make_prompt(parents, population)
         return prompt
 
     @abstractmethod
-    def make_prompt(self, subjects: list[Solution], population: list[Solution]) -> str:
+    def make_prompt(self, parents: list[Solution], population: list[Solution]) -> str:
         pass

@@ -38,8 +38,8 @@ Give an excellent and novel heuristic algorithm to solve this task.
                 # "Generate a new algorithm that is different from the algorithms you have tried before.", #new random solution
             ]
 
-    def make_prompt(self, subjects: list[Solution], population: list[Solution]) -> str:
-        individual: Solution = subjects[0]
+    def make_prompt(self, parents: list[Solution], population: list[Solution]) -> str:
+        individual: Solution = parents[0]
 
         # Generate the current population summary
         population_summary = "\n".join([ind.get_summary() for ind in population])

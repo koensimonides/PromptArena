@@ -40,7 +40,7 @@ mutation_prompts5 = [
 mutation_prompts_list = [mutation_prompts1, mutation_prompts2, mutation_prompts3, mutation_prompts4, mutation_prompts5]
 
 
-for mpi in [2]:
+for mpi in range(5):
     mutation_prompts = mutation_prompts_list[mpi]
 
     # Collect log files for all experiments using different prompts

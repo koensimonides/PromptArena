@@ -62,13 +62,14 @@ class PromptArena(object):
         Returns:
             MatchResult: Match data and new solution
         """
-            
+        
         parents = self._select_parents(parent_population, original)
 
         if len(parents) != self.prompt_constructor.parent_count:
             self.logevent(f"Failed to find parents for original {original.id}")
             return None
 
+        parent_fitness = max([parent.fitness for parent in parents]) # Use best parent fitness
         prompt_text = self.prompt_constructor([parent.copy() for parent in parents], parent_population)
 
         session_messages = [
@@ -95,7 +96,7 @@ class PromptArena(object):
         new_solution.generation = original.generation
         fitness_delta = self._compare(original, new_solution)
 
-        return MatchResult(data_name, original.id, new_solution, fitness_delta)
+        return MatchResult(data_name, original.id, parent_fitness, new_solution, fitness_delta)
  
     def run(self) -> list[MatchResult]:
         """

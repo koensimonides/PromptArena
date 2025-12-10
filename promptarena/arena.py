@@ -165,7 +165,8 @@ class PromptArena(object):
             # Original prompt used less parents than current prompt, add extra from remaining population
             remaining_parent_pop = [parent for parent in original_parent_population if parent.id not in original.parent_ids]
             remaining_count = target_count - len(original_parents)
-            new_parents = original_parents + np.random.choice(remaining_parent_pop, size=remaining_count, replace=False) 
+            extra = np.random.choice(remaining_parent_pop, size=remaining_count, replace=False).tolist()
+            new_parents = original_parents + extra
         else:
             # Original prompt used the same amount of parents as current prompt, copy that selection
             new_parents = original_parents

@@ -94,7 +94,7 @@ class PromptArena(object):
             )
 
         new_solution.generation = original.generation
-        fitness_delta = self._compare(original, new_solution)
+        fitness_delta = self._compare(parent_fitness, new_solution)
 
         return MatchResult(data_name, original.id, parent_fitness, new_solution, fitness_delta)
  
@@ -173,18 +173,18 @@ class PromptArena(object):
 
         return new_parents
     
-    def _compare(self, original: Solution, new: Solution) -> float:
+    def _compare(self, parent_fitness: float, new: Solution) -> float:
         # Determine fitness delta
         # both >= 0         -> new fitness - old fitness
         # new >= 0, old bad -> new fitness 
         # new bad, old > 0  -> -old fitness
         # both bad          -> 0
         fitness_delta = 0.0
-        if new.fitness >= 0 and original.fitness >= 0:
-            fitness_delta = new.fitness - original.fitness
+        if new.fitness >= 0 and parent_fitness >= 0:
+            fitness_delta = new.fitness - parent_fitness
         elif new.fitness >= 0:
             fitness_delta = new.fitness
-        elif original.fitness > 0:
-            fitness_delta = -original.fitness
+        elif parent_fitness > 0:
+            fitness_delta = -parent_fitness
 
         return fitness_delta

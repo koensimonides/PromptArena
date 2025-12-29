@@ -45,24 +45,27 @@ prompts_lists: list[tuple[list[str], int]] = [
     ([ #single structural change
         "Modify the selected algorithm by introducing a meaningful structural change that alters its overall search behavior.",
     ], 1),
-    ([ # combine 2
+    ([ #combine 2
         "Combine the algorithmic structures of the following two optimization methods by simulating a natural genetic crossover, producing a hybrid metaheuristic that inherits key traits from both parents.",
     ], 2), 
-    ([ # combine 3
+    ([ #combine 3
         "Combine the algorithmic structures of the following two optimization methods by simulating a natural genetic crossover, producing a hybrid metaheuristic that inherits key traits from both parents.",
     ], 3), 
-    ([ # crossover simplify 2
+    ([ #crossover simplify 2
         "Simplify and recombine the selected algorithms, preserving only the most effective ideas from each.",
     ], 2), 
-    ([ # crossover new random 2
+    ([ #crossover new random 2
         "Generate a new algorithm that is different from the selected two optimization methods.",
     ], 2), 
+    ([ #correction
+        "Correct any mistakes in the selected algorithm.",
+    ], 1),
 ]
 
 # Fix the method
-method = 0
+start_index = 0
 
-for mpi in range(5):
+for mpi in range(start_index, len(prompts_lists)):
     prompts, parents = prompts_lists[mpi]
 
     # Collect log files for all experiments using different prompts

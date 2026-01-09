@@ -13,3 +13,4 @@ env/
 # Data and experiments
 /data
 /exp-*/
+/method_analysis_*/

@@ -21,12 +21,11 @@ class ExperimentData(object):
         solutions = deserializer.read()
         return ExperimentData(logfile, solutions)
     
-    def sample_non_final_generation(self) -> list[Solution]:
+    def sample_generation(self) -> list[Solution]:
         if not self.generation_map or self.generations <= 1:
             return []
         
-        non_final_gen_keys = [g for g in self.generation_map.keys() if g != max(self.generation_map.keys())]
-        return self.generation_map[random.choice(non_final_gen_keys)]
+        return random.choice(list(self.generation_map.values()))
 
     def _group_by_generation(self):
         gen_map = defaultdict(list)
@@ -48,7 +47,7 @@ class ExperimentDataSet(object):
     def sample_experiment(self) -> ExperimentData:
         return random.choice(self.experiments)
 
-    def sample_non_final_generation(self) -> Tuple[str, list[Solution]]:
+    def sample_generation(self) -> Tuple[str, list[Solution]]:
         data = random.choice(self.experiments)
-        generation = data.sample_non_final_generation()
+        generation = data.sample_generation()
         return data.name, generation

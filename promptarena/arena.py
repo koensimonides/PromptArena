@@ -50,24 +50,19 @@ class PromptArena(object):
 
         return updated_individual
     
-    def run_match(self, data_name: str, parent_population: list[Solution], original: Solution) -> MatchResult:
+    def run_match(self, dataset_name: str, parent_population: list[Solution]) -> MatchResult:
         """
         Run a single match by generating and evaluating a new solution.
 
         Args:
-            data_name (str): Identifier of the dataset.
+            dataset_name (str): Identifier of the dataset.
             parent_population (list[Solution]): Candidate parents for selection.
-            original (Solution): Baseline solution used for comparison.
 
         Returns:
             MatchResult: Match data and new solution
         """
         
-        parents = self._select_parents(parent_population, original)
-
-        if len(parents) != self.prompt_constructor.parent_count:
-            self.logevent(f"Failed to find parents for original {original.id}")
-            return None
+        parents = self._select_parents(parent_population)
 
         parent_fitness = max([parent.fitness for parent in parents]) # Use best parent fitness
         prompt_text = self.prompt_constructor([parent.copy() for parent in parents], parent_population)
@@ -93,10 +88,10 @@ class PromptArena(object):
                 -np.inf, f"An exception occurred: {e.__repr__()}.", e
             )
 
-        new_solution.generation = original.generation
+        new_solution.generation = parents[0].generation + 1
         fitness_delta = self._compare(parent_fitness, new_solution)
 
-        return MatchResult(data_name, original.id, parent_fitness, new_solution, fitness_delta)
+        return MatchResult(dataset_name, [parent.id for parent in parents], parent_fitness, new_solution, fitness_delta)
  
     def run(self) -> list[MatchResult]:
         """
@@ -115,12 +110,10 @@ class PromptArena(object):
         for i in range(self.budget):
             # Sample match
             experiment = self.data.sample_experiment()
-            parent_population = experiment.sample_non_final_generation()
-            child_generation = parent_population[0].generation + 1
-            original = np.random.choice(experiment.generation_map[child_generation])
+            parent_population = experiment.sample_generation()
 
             # Run match
-            result: MatchResult | None = self.run_match(experiment.name, parent_population, original)
+            result: MatchResult | None = self.run_match(experiment.name, parent_population)
             if result == None: # TODO, should in theory never happen
                 continue
 
@@ -138,13 +131,12 @@ class PromptArena(object):
         
         return self.results
 
-    def _select_parents(self, original_parent_population: list[Solution], original: Solution) -> list[Solution]:
+    def _select_parents(self, parent_population: list[Solution]) -> list[Solution]:
         """
         Select a parent set matching the required parent count.
 
         Args:
-            original_parent_population (list[Solution]): Full available population.
-            original (Solution): Original solution containing its parent IDs.
+            parent_population (list[Solution]): Available population.
 
         Returns:
             list[Solution]: Selected parent solutions sized to `parent_count`.
@@ -152,26 +144,10 @@ class PromptArena(object):
             
         target_count = self.prompt_constructor.parent_count
 
-        if (target_count > len(original_parent_population)):
-            raise ValueError(f"Cannot satisfy prompt subjects, required {target_count} but population is of size {len(original_parent_population)}")
+        if (target_count > len(parent_population)):
+            raise ValueError(f"Cannot satisfy prompt subjects, required {target_count} but population is of size {len(parent_population)}")
 
-        original_parents = [parent for parent in original_parent_population if parent.id in original.parent_ids]
-
-        new_parents: list[Solution] = []
-        if (len(original_parents) > target_count):
-            # Original prompt used more parents than current prompt, pick required count from these
-            new_parents = np.random.choice(original_parents, size=target_count, replace=False)
-        elif (len(original_parents) < target_count):
-            # Original prompt used less parents than current prompt, add extra from remaining population
-            remaining_parent_pop = [parent for parent in original_parent_population if parent.id not in original.parent_ids]
-            remaining_count = target_count - len(original_parents)
-            extra = np.random.choice(remaining_parent_pop, size=remaining_count, replace=False).tolist()
-            new_parents = original_parents + extra
-        else:
-            # Original prompt used the same amount of parents as current prompt, copy that selection
-            new_parents = original_parents
-
-        return new_parents
+        return np.random.choice(parent_population, size=target_count, replace=False).tolist()
     
     def _compare(self, parent_fitness: float, new: Solution) -> float:
         # Determine fitness delta

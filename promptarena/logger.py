@@ -14,7 +14,8 @@ class ArenaExperimentLogger(ExperimentLogger):
         file_path = f"{self.dirname}/matchlog.csv"
         with open(file_path, "a", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
-            writer.writerow([match_result.original_data, match_result.original_id, match_result.parent_fitness, match_result.new_solution.id, match_result.fitness_delta])
+            # format: parent-dataset,parent1.id:parent2.id:...,parent-fitness,child-id,fitness-delta
+            writer.writerow([match_result.dataset, ":".join(match_result.parent_ids), match_result.parent_fitness, match_result.new_solution.id, match_result.fitness_delta])
 
     # To handle newer log_conversation function in iohblade
     # Can possibly be removed

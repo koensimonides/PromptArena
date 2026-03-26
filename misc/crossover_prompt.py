@@ -45,7 +45,7 @@ class CrossoverPrompt(PromptConstructor):
 The current population of algorithms already evaluated (name, description, score) is:
 {population_summary}
 
-The selected solutions to apply crossover are:
+The selected algorithms are:
 {parent_infos}
 
 {mutation_operator}

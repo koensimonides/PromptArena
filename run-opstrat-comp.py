@@ -37,11 +37,11 @@ Give an excellent and novel heuristic algorithm to solve this task."""
     def llm_gemini():
         api_key = os.getenv("GEMINI_API_KEY")
         llm_model = "gemini-2.0-flash"
-        return ("gemini", Gemini_LLM(api_key, llm_model))
+        return Gemini_LLM(api_key, llm_model)
 
     def llm_qwen():
         llm_model = "qwen3-coder:30b"
-        return ("qwen", Ollama_LLM(model=llm_model))
+        return Ollama_LLM(model=llm_model)
 
     LLM1 = llm_gemini()
     # LLM2 = llm_qwen()
@@ -55,7 +55,7 @@ Give an excellent and novel heuristic algorithm to solve this task."""
     # Start at a specific index to continue experiments
     start_index = 0
 
-    for llm_id, llm in [LLM1]: # [LLM1, LLM2]:
+    for llm in [LLM1]: # [LLM1, LLM2]:
         for operator_index in range(start_index, len(operators_config)):
             operator_id, operator_message, parent_count = operators_config[operator_index]
 
@@ -63,7 +63,7 @@ Give an excellent and novel heuristic algorithm to solve this task."""
             data = ExperimentDataSet.load_logs(logfiles)
 
             constructor = ClassicPrompt(mutation_prompts=[operator_message], task_prompt=task_message) if parent_count == 1 else CrossoverPrompt(crossover_prompts=[operator_message], parent_count=parent_count, task_prompt=task_message)
-            local_experiment_name = f"{experiment_name}-{llm_id}-{(operator_index + 1)}"
+            local_experiment_name = f"{experiment_name}-{(operator_index + 1)}"
             arena = PromptArena(problem, constructor, llm, data, budget=budget, experiment_name=local_experiment_name)
             arena.run()
 
